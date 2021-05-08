@@ -1,3 +1,3 @@
 | 1. | 2. |
 |-----|-----|
-|[subject](./subject_en.txt) | [my_solution](./inter.c)|
+|[Subject](./subject_en.txt) | [My Solution](./inter.c)|
