@@ -30,7 +30,7 @@ static int	ft_strlen(char *str)
 
 /*
 ** static void	ft_fill_n_chars_with_backslash_n(char *str, int len)
-** This function will fill len first character of str string with '\0' char
+** This function will fill len first characters of str string with '\0' char
 ** Same as calloc function, but this one is used with a string on the stack
 */
 
