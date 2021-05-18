@@ -19,6 +19,10 @@ set mouse=a
 # Show lines numbers
 set number
 
+# Show Cursor line
+set cursorline
+
 # Apply colors syntax
 syntax on
+colo default
 ```
