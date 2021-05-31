@@ -1,0 +1,39 @@
+Important note!
+
+This is the subject as I remember it from my personal exam, some parts might written in a different way, but overall the assignement is the same.
+
+Question number 1 for 50 points:
+
+--------------------------------------------
+inter
+--------------------------------------------
+Expected files: 
+
+inter.c
+--------------------------------------------
+Prototype:
+
+n/a: main needs to be included to call inter
+You are free to prototype it as you wish
+--------------------------------------------
+Allowed functions:
+
+write
+--------------------------------------------
+Assignement:
+
+Write a program that will take 2 strings as
+arguments and display all the chars present
+in both strings (only once) in the order
+they appear in the first string.
+
+The display must be followed by a newline.
+
+If there are not enough arguments, your 
+program must display a newline.
+--------------------------------------------
+Examples:
+./inter "abcddd" "dba" | cat -e ---> abd$
+./inter "non" "n" | cat -e ---> n$
+./inter a bd e gh | cat -e ---> $
+./inter "bonjour" "xav" | cat -e --> $
