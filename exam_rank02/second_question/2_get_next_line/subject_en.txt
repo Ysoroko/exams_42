@@ -1,0 +1,76 @@
+Important note!
+
+This is the subject as I remember it from my personal exam, some parts might written in a different way, but overall the assignement is the same.
+
+Question number 2 for 50 points:
+
+--------------------------------------------
+get_next_line
+--------------------------------------------
+Expected files: 
+
+get_next_line.c get_next_line.h
+--------------------------------------------
+Prototype:
+
+int get_next_line(char **line);
+--------------------------------------------
+Allowed functions:
+
+malloc, free, read
+--------------------------------------------
+Assignement:
+
+Write a function called get_next_line which
+when called will read a line from file
+descriptor 0 and store it in *line argument.
+
+The *line result needs to be freeable
+(this basically means you need to malloc it
+inside your get_next_line_function).
+
+The function will return 1 if a line has
+been read, 0 if an end of file has been
+reached and -1 if an error was encountered.
+
+The function get_next_line must not contain
+any leaks.
+
+Calling this function in a "while" loop
+should allow us to read the entire file
+descriptor until end of file is reached.
+--------------------------------------------
+Examples:
+
+No examples are provided in the subject.
+
+However, a tester and 2 main.c files
+are given to test your get_next_line.
+
+Basically, your function simply needs to
+store input in *line.
+The main.c files will wait for user input
+and then print the value of *line, which
+must be the same as user input.
+--------------------------------------------
+Personal tips:
+
+Unlike in get_next_line project, there is no
+buffer size defined during compilation.
+This means we can avoid having a static
+"remainer" if we simply use buffer size of 1
+in our "read" function.
+(However optimization-wize it's a rather poor
+solution.)
+
+Leaks can be tested by adding the provided
+main in main.c file to our function, running
+it with a couple of different inputs and
+running 
+"leaks [executable name (a.out by default)]" 
+in a different terminal while our 
+get_next_line is running in our main terminal
+
+
+
+

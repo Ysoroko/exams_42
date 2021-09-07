@@ -1,0 +1,40 @@
+Important note!
+
+This is the subject as I remember it from my personal exam, some parts might written in a different way, but overall the assignement is the same.
+
+Question number 1 for 50 points:
+
+--------------------------------------------
+union
+--------------------------------------------
+Expected files: 
+
+union.c
+--------------------------------------------
+Prototype:
+
+n/a: main needs to be included to call inter
+You are free to prototype it as you wish
+--------------------------------------------
+Allowed functions:
+
+write
+--------------------------------------------
+Assignement:
+
+Write a program that will take 2 strings as
+arguments and display all the chars present
+in any of the strings (only once) in the
+order they appear in the first string.
+
+The display must be followed by a newline.
+
+If there are not enough or too many arguments,
+your program must display a newline.
+--------------------------------------------
+Examples:
+./union "abcddd" "dba" | cat -e ---> abcd$
+./union "non" "n" | cat -e ---> no$
+./union "pas" "ta" | cat -e ---> past$
+./union a bd e gh | cat -e ---> $
+./union "bonjour" "xav" | cat -e --> $
