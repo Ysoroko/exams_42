@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:23:47 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/07 11:26:00 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/08 14:19:04 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,7 +30,7 @@ void	ft_putstr_fd(char *str, int fd)
 
 void	ft_putendl_fd(char *str, int fd)
 {
-		int	i;
+	int	i;
 
 	i = -1;
 	if (!str)

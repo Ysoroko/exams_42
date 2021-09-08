@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:26:24 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/07 11:29:51 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/08 14:20:02 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -16,9 +16,17 @@
 # include <stdio.h>
 # include <unistd.h>
 
+/*
+** PRINT_UTILS.C
+*/
+
 void	ft_putendl_fd(char *str, int fd);
 void	ft_putchar_fd(char c, int fd);
 void	ft_putstr_fd(char *str, int fd);
+
+/*
+** FT_UTILS.C
+*/
 
 # define WRONG_N_ARGS "Error: argument"
 # define CORRUPTED_FILE "Error: Operation file corrupted"
