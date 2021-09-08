@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:22:01 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/08 17:36:59 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/08 17:44:33 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -39,9 +39,6 @@ static t_first_line *ft_init_first_line(FILE *file)
 	t_first_line	*ret;
 
 	fscanf(file, "%d %d %c %c ", &width, &height, &fill_char, &too_much_args);
-	printf("%d %d %c %c \n", width, height, fill_char, too_much_args);
-	fscanf(file, "%d %d %c %c ", &width, &height, &fill_char, &too_much_args);
-	printf("%d %d %c %c \n", width, height, fill_char, too_much_args);
 	if (too_much_args)
 		return (NULL);
 	ret = ft_calloc(sizeof(t_first_line));
