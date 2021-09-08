@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:22:01 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/08 15:36:51 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/08 17:36:59 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -30,15 +30,41 @@ static int	ft_analyze_args_and_init_file(int argc, char **argv, FILE **file)
 	return (0);
 }
 
+static t_first_line *ft_init_first_line(FILE *file)
+{
+	int				width;
+	int				height;
+	char			fill_char;
+	char			too_much_args;
+	t_first_line	*ret;
+
+	fscanf(file, "%d %d %c %c ", &width, &height, &fill_char, &too_much_args);
+	printf("%d %d %c %c \n", width, height, fill_char, too_much_args);
+	fscanf(file, "%d %d %c %c ", &width, &height, &fill_char, &too_much_args);
+	printf("%d %d %c %c \n", width, height, fill_char, too_much_args);
+	if (too_much_args)
+		return (NULL);
+	ret = ft_calloc(sizeof(t_first_line));
+	if (!ret)
+		return (NULL);
+	ret->screen_width = width;
+	ret->scren_height = height;
+	ret->background_char = fill_char;
+	return (ret);
+}
+
 int	main(int argc, char **argv)
 {
-	FILE	*file;
+	FILE			*file;
+	t_first_line	*f_line;
 
 	if (ft_analyze_args_and_init_file(argc, argv, &file))
 		return (1);
-	int i, f;
-	char ch;
-
-	printf("%d %d %c \n", i, f, ch);
+	f_line = ft_init_first_line(file);
+	if (!f_line)
+	{
+		ft_putendl_fd(CORRUPTED_FILE, STDOUT);
+		return (1);
+	}
 	return (0);
 }

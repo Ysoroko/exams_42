@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:26:24 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/08 15:26:11 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/08 17:32:41 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,6 +15,7 @@
 
 # include <stdio.h>
 # include <unistd.h>
+# include <stdlib.h>
 
 /*
 ** PRINT_UTILS.C
@@ -30,6 +31,18 @@ void	ft_putstr_fd(char *str, int fd);
 
 int		ft_strchr(char *str, char c);
 
+/*
+** FT_STRUCT_UTILS.C
+*/
+
+void	*ft_calloc(size_t size);
+
+typedef struct s_first_line
+{
+	int		screen_width;
+	int		scren_height;
+	char	background_char;
+}	t_first_line;
 
 # define WRONG_N_ARGS "Error: argument"
 # define CORRUPTED_FILE "Error: Operation file corrupted"

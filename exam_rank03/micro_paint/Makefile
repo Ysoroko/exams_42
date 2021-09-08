@@ -6,12 +6,13 @@
 #    By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+         #
 #                                                 +#+#+#+#+#+   +#+            #
 #    Created: 2021/09/08 14:17:43 by ysoroko           #+#    #+#              #
-#    Updated: 2021/09/08 16:33:58 by ysoroko          ###   ########.fr        #
+#    Updated: 2021/09/08 17:32:27 by ysoroko          ###   ########.fr        #
 #                                                                              #
 # **************************************************************************** #
 
 UTILS	=	utils/ft_string_utils.c \
 			utils/ft_print_utils.c \
+			utils/ft_struct_utils.c \
 
 SRC		=	$(UTILS) \
 			ft_main.c \
