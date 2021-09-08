@@ -1,12 +1,12 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_utils.c                                         :+:      :+:    :+:   */
+/*   ft_string_utils.c                                  :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/08 14:08:09 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/08 14:20:08 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/08 15:26:01 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -37,24 +37,15 @@ int	ft_wrong_number_str(char *str)
 	return (0);
 }
 
-/// Transforms str to an int
-int	ft_atoi(char *str)
+int	ft_strchr(char *str, char c)
 {
-	int	n;
-	int	sign;
 	int	i;
 
 	i = -1;
-	n = 0;
-	sign = 1;
-	if (str[0] == '-')
-	{
-		sign = -1;
-		i++;
-	}
 	while (str[++i])
 	{
-		n = n * 10 + str[i] - '0';
+		if (str[i] == c)
+			return (1);
 	}
-	return (sign * n);
+	return (0);
 }

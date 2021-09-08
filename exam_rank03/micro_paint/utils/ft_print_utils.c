@@ -6,11 +6,11 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:23:47 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/08 14:19:04 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/08 15:30:44 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "ft_micro_paint.h"
+#include "../ft_micro_paint.h"
 
 void	ft_putchar_fd(char c, int fd)
 {
@@ -25,7 +25,7 @@ void	ft_putstr_fd(char *str, int fd)
 	if (!str)
 		return ;
 	while (str[++i])
-		ft_putchar(str[i], fd);
+		ft_putchar_fd(str[i], fd);
 }
 
 void	ft_putendl_fd(char *str, int fd)
@@ -36,6 +36,6 @@ void	ft_putendl_fd(char *str, int fd)
 	if (!str)
 		return ;
 	while (str[++i])
-		ft_putchar(str[i], fd);
-	ft_putchar('\n', fd);
+		ft_putchar_fd(str[i], fd);
+	ft_putchar_fd('\n', fd);
 }
