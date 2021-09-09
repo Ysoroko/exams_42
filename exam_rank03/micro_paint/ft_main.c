@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:22:01 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/08 17:44:33 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/09 10:27:56 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,19 +34,19 @@ static t_first_line *ft_init_first_line(FILE *file)
 {
 	int				width;
 	int				height;
-	char			fill_char;
-	char			too_much_args;
+	char			fill_char[5];
 	t_first_line	*ret;
 
-	fscanf(file, "%d %d %c %c ", &width, &height, &fill_char, &too_much_args);
-	if (too_much_args)
-		return (NULL);
+	printf("OK\n");
+	fscanf(file, "%d %d %[^\n]", &width, &height, fill_char);
+	//fscanf(file, "%d %d %s", &width, &height, fill_char);
+	printf("W: [%d]\nH: [%d]\nF:[%s]\n", width, height, fill_char);
 	ret = ft_calloc(sizeof(t_first_line));
 	if (!ret)
 		return (NULL);
-	ret->screen_width = width;
-	ret->scren_height = height;
-	ret->background_char = fill_char;
+	//ret->screen_width = width;
+	//ret->scren_height = height;
+	//ret->background_char = (*fill_char)[0];
 	return (ret);
 }
 
