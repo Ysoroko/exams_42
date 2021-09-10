@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/07 11:22:01 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/09 10:27:56 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/09 12:03:31 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,13 +34,13 @@ static t_first_line *ft_init_first_line(FILE *file)
 {
 	int				width;
 	int				height;
-	char			fill_char[5];
+	char			fill_char;
+	char			rest[200];
 	t_first_line	*ret;
 
-	printf("OK\n");
-	fscanf(file, "%d %d %[^\n]", &width, &height, fill_char);
+	fscanf(file, "%d %d %c\n", &width, &height, &fill_char);
 	//fscanf(file, "%d %d %s", &width, &height, fill_char);
-	printf("W: [%d]\nH: [%d]\nF:[%s]\n", width, height, fill_char);
+	printf("W: [%d]\nH: [%d]\nF:[%c]\n", width, height, fill_char);
 	ret = ft_calloc(sizeof(t_first_line));
 	if (!ret)
 		return (NULL);
@@ -63,5 +63,6 @@ int	main(int argc, char **argv)
 		ft_putendl_fd(CORRUPTED_FILE, STDOUT);
 		return (1);
 	}
+	fclose(file);
 	return (0);
 }
