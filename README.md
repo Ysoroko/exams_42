@@ -9,6 +9,7 @@ The exams of 42 network coding school and my solutions to them.
 In the root directory you will have a hidden ".vimrc" Vim configuration file.
 
 As it says, you will need to create your own ".myvimrc" file and add the configuration lines inside.
+
 (Alternatively, you can just enter the following commands in Vim itself (press ESC, enter the command, press Enter))
 
 Just add the following lines inside:
