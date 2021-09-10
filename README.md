@@ -21,5 +21,4 @@ set number
 
 # Apply colors syntax
 syntax on
-colo default
 ```
