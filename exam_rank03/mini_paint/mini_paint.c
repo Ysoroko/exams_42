@@ -187,6 +187,145 @@ void	ft_print_final_result(char **background)
 		ft_putendl(background[i], 0);
 }
 
+/// Check for values errors, malloc a new t_circle, fill in the values and assign *circle argument to be the new t_circle
+/// Possible errors:
+/// 1) Circle type character is different from 'c' and 'C'
+/// 2) Radius is less than or equal to 0
+/// Returns KO if an error is found or if the malloc call fails
+/// Returns OK otherwise
+int	ft_check_for_value_errors_and_init_circle(char c_type, float xc, float yc, float radius, char draw_char, t_circle **circle)
+{
+	t_circle	*res;
+
+	if (c_type != 'c' && c_type != 'C')
+		return (KO);
+	if (radius <= 0)
+		return (KO);
+	res = malloc(sizeof(t_circle));
+	if (!res)
+		return (KO);
+	res->c_type = c_type;
+	res->xc = xc;
+	res->yc = yc;
+	res->radius = radius;
+	res->draw_char = draw_char;
+	*circle = res;
+	return (OK);
+}
+
+/// Returns the distance between two points [x_a ; y_a] and [x_b ; y_b]
+/// If you've got 2 points are defined as (Xa,Ya) and (Xb,Yb)
+/// Distance between the two points is : srqt((Xa - Xb) * (Xa - Xb) + (Ya - Yb) * (Ya - Yb)) 
+float	ft_get_distance(float x_a, float y_a, float x_b, float y_b)
+{
+	float	x_diff;
+	float	y_diff;
+	float	x_diff_sqr;
+	float	y_diff_sqr;
+	float	sqr_sum;
+
+	x_diff = x_a - x_b;
+	x_diff_sqr = powf(x_diff, 2);
+	y_diff = y_a - y_b;
+	y_diff_sqr = powf(y_diff, 2);
+	sqr_sum = x_diff_sqr + y_diff_sqr;
+	return (sqrtf(sqr_sum));
+}
+
+/// Returns OK if the point [x ; y] belongs to the circle argument
+/// Returns KO otherwise
+/// A point belongs to the circle if all the criteria are met:
+/// 'c' circle (border only):
+/// 1) x_point belongs to the range [x_center_circle - radius ; x_center_circle + radius]
+/// 2) y_point belongs to the range [y_center_circle - radius; y_center_circle + radius]
+/// 3) Distance between the circle border and the point is <= 1
+/// (RADIUS - P_DISTANCE_TO_CENTER <= 1);
+///
+///
+/// 'C' circle (filled-in circle)
+/// 1) x_point belongs to the range [x_center_circle - radius ; x_center_circle + radius]
+/// 2) y_point belongs to the range [y_center_circle - radius; y_center_circle + radius]
+/// 3) Distance between the point and the center of the circle <= radius of the circle
+/// (This is the same as the first 2 conditions)
+int	ft_belongs_to_the_circle(float x, float y, t_circle *circle)
+{
+	float	distance_to_center;
+	float	xc;
+	float	yc;
+	float	radius;
+
+	xc = circle->xc;
+	yc = circle->yc;
+	radius = circle->radius;
+	if (x < xc - radius || x > xc + radius)
+		return (KO);
+	if (y < yc - radius || y > yc + radius)
+		return (KO);
+	distance_to_center = ft_get_distance(x, y, circle->xc, circle->yc);
+	if (circle->c_type == 'c')
+	{
+		if (radius - distance_to_center <= 1)
+			return (OK);;
+	}
+	else if (circle->c_type == 'C')
+	{
+		if (distance_to_center <= radius)
+			return (OK);
+	}
+	return (KO);
+
+}
+
+/// Goes through the background and checks if the point [x;y] belongs to the circle
+/// If so, changes the character background[y][x] character
+void	ft_draw_the_circle(char **background, t_circle *circle)
+{
+	int	x;
+	int	y;
+	char	draw_char;
+
+	y = -1;
+	draw_char = circle->draw_char;
+	while (background[++y])
+	{
+		x = -1;
+		while (background[y][++x])
+		{
+			if (ft_belongs_to_the_circle((float)x, (float)y, circle) == OK)
+				background[y][x] = draw_char;
+		}
+	}
+
+}
+
+/// The central function of drawing on background
+/// Reads next line from file, initializes a t_circle structure based on values
+/// and modifies the characters in the background based on the circle
+/// Displays an error message and returns KO if an error is found in file or a malloc failure
+/// Returns OK otherwise
+int	ft_draw_on_background(FILE *file, char **background)
+{
+	t_circle	*circle;
+	int			fscanf_ret;
+	char		c_type;
+	float		xc;
+	float		yc;
+	float		radius;
+	char		draw_char;
+
+	while ((fscanf_ret = fscanf(file, "%c %f %f %f %c\n", &c_type, &xc, &yc, &radius, &draw_char)) == 5)
+	{
+		if (ft_check_for_value_errors_and_init_circle(c_type, xc, yc, radius, draw_char, &circle) == KO)
+			return (ft_putendl(FILE_ERROR, KO));
+		ft_draw_the_circle(background, circle); 
+		free(circle);
+
+	}
+	if (fscanf_ret != EOF)
+		return (ft_putendl(FILE_ERROR, KO));
+	return (OK);	
+}
+
 int	main(int argc, char **argv)
 {
 	FILE		*file;
@@ -199,6 +338,8 @@ int	main(int argc, char **argv)
 		return (ft_cleanup(file, NULL, NULL, KO));
 	if (ft_init_background(canvas, &background) == KO)
 		return (ft_cleanup(file, canvas, NULL, KO));
+	if (ft_draw_on_background(file, background) == KO)
+		return (ft_cleanup(file, canvas, background, KO));
 	ft_print_final_result(background);
 	return (ft_cleanup(file, canvas, background, OK));
 }
