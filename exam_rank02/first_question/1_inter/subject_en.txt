@@ -29,8 +29,8 @@ they appear in the first string.
 
 The display must be followed by a newline.
 
-If there are not enough arguments, your 
-program must display a newline.
+If there are not enough (or too many)
+arguments, your program must display a '\n'
 --------------------------------------------
 Examples:
 ./inter "abcddd" "dba" | cat -e ---> abd$
