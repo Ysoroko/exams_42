@@ -48,7 +48,7 @@ int	ft_putendl(char *str, int to_return)
 	if (!str)
 		return (KO);
 	write(1, str, ft_strlen(str));
-	write(1, "\n", 1);
+	ft_putchar('\n');
 	return (to_return);
 }
 
@@ -97,7 +97,7 @@ int	ft_init_canvas(FILE *file, t_canvas **canvas)
 	int		fscanf_ret;
 	t_canvas	*c;
 
-	fscanf_ret = fscanf(file, "%d %d %c\n", &width, &height, &background_char);
+	fscanf_ret = fscanf(file, " %d %d %c\n", &width, &height, &background_char);
 	if (fscanf_ret != 3)
 		return (ft_putendl(FILE_ERROR, KO));
 	if (ft_check_for_canvas_errors(width, height) == KO)
@@ -238,8 +238,8 @@ float	ft_get_distance(float x_a, float y_a, float x_b, float y_b)
 /// 'c' circle (border only):
 /// 1) x_point belongs to the range [x_center_circle - radius ; x_center_circle + radius]
 /// 2) y_point belongs to the range [y_center_circle - radius; y_center_circle + radius]
-/// 3) Distance between the circle border and the point is <= 1
-/// (RADIUS - P_DISTANCE_TO_CENTER <= 1);
+/// 3) Distance between the circle border and the point is < 1
+/// (RADIUS - P_DISTANCE_TO_CENTER < 1);
 ///
 ///
 /// 'C' circle (filled-in circle)
@@ -257,18 +257,18 @@ int	ft_belongs_to_the_circle(float x, float y, t_circle *circle)
 	xc = circle->xc;
 	yc = circle->yc;
 	radius = circle->radius;
-	if (x < xc - radius || x > xc + radius)
-		return (KO);
-	if (y < yc - radius || y > yc + radius)
-		return (KO);
 	distance_to_center = ft_get_distance(x, y, circle->xc, circle->yc);
 	if (circle->c_type == 'c')
 	{
-		if (radius - distance_to_center <= 1)
-			return (OK);;
+		if (distance_to_center > radius || distance_to_center < radius - 1)
+			return (KO);
+		if (radius - distance_to_center < 1 && radius - distance_to_center >= 0)
+			return (OK);
 	}
 	else if (circle->c_type == 'C')
 	{
+		if (distance_to_center > radius)
+			return (KO);
 		if (distance_to_center <= radius)
 			return (OK);
 	}
