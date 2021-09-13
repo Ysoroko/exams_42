@@ -260,15 +260,13 @@ int	ft_belongs_to_the_circle(float x, float y, t_circle *circle)
 	distance_to_center = ft_get_distance(x, y, circle->xc, circle->yc);
 	if (circle->c_type == 'c')
 	{
-		if (distance_to_center > radius || distance_to_center < radius - 1)
-			return (KO);
-		if (radius - distance_to_center < 1 && radius - distance_to_center >= 0)
+		// distance to center needs to be (<= radius) and (> radius - 1)
+		if (distance_to_center <= radius && radius - distance_to_center < 1)
 			return (OK);
 	}
 	else if (circle->c_type == 'C')
 	{
-		if (distance_to_center > radius)
-			return (KO);
+		// distance to center needs to be (<= radius)
 		if (distance_to_center <= radius)
 			return (OK);
 	}
