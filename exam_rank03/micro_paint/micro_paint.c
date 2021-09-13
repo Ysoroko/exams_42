@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   micro_paint.c                                      :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: ysoroko <marvin@42.fr>                     +#+  +:+       +#+        */
+/*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/09/10 13:43:00 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/09/10 14:15:04 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/09/13 14:46:31 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -227,13 +227,19 @@ int	ft_need_to_draw_here(float x, float y, t_rectangle *rectangle)
 	rect_type = rectangle->r_type;
 	if (rect_type == 'R')
 	{
+		// x needs to be inside limits [xtl ; xbr]
+		// y needs to be inside limits [ytl ; ybr]
 		if (xtl <= x && xbr >=x && ytl <= y && ybr >= y)
 		   return (1);
 	}
 	else if (rect_type == 'r')
 	{
+		// x needs to be inside limits [xtl ; xbr]
+		// y needs to be inside limits [ytl ; ybr]
 		if (x < xtl || x > xbr || y < ytl || y > ybr)
 			return (0);
+		// x is at distance less than 1 from xtl or xbr
+		// y is at distance less than 1 from ytl or ybr
 		if (x - xtl < 1 || xbr - x < 1 || y - ytl < 1 || ybr - y < 1)
 			return (1);
 	}
