@@ -7,11 +7,11 @@ The exams of 42 network coding school and my solutions to them.
 
 ## Exam Vim Configuration 
 
-Just enter the following commands one by one in Vim command line 
+Add the following commands to the ".vimrc" file at the root repository or enter them one by one in Vim command line
 
 (While in Vim, press ESC, press ":", enter the command, hit Enter)
 
-```conf
+```bash
 # Enable the mouse input
 set mouse=a
 
