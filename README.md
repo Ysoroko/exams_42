@@ -1,9 +1,9 @@
 # exams_42
 The exams of 42 network coding school and my solutions to them.
 
-| 1. | 2. |
------|-----
-[Exam Rank 02](https://github.com/Ysoroko/exams_42/tree/master/exam_rank02)| [Exam Rank 03](https://github.com/Ysoroko/exams_42/tree/master/exam_rank03)
+| 1. | 2. | 3. |
+-----|-----|-----|
+[Exam Rank 02](https://github.com/Ysoroko/exams_42/tree/master/exam_rank02)| [Exam Rank 03](https://github.com/Ysoroko/exams_42/tree/master/exam_rank03)| [Exam Rank 04](https://github.com/Ysoroko/exams_42/tree/master/exam_rank04)
 
 ## Exam Vim Configuration 
 
