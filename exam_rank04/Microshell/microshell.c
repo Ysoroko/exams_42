@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/19 11:27:35 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/10/22 14:43:58 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/10/22 15:17:20 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -25,10 +25,15 @@
 #define STDOUT 1
 #define STDERR 2
 
+#define TYPE_ONE 1
+#define TYPE_PIPED 2
+#define TYPE_SEPARATE 3
 
 typedef	struct s_command
 {
-
+	int					type; //one command , piped or ';'
+	int					pipes[2];
+	char				**args;
 	struct s_command	*prev;
 	struct s_command	*next;
 
@@ -40,6 +45,33 @@ int		ft_strlen(char *str)
 	while (str[i])
 		i++;
 	return (i);
+}
+
+t_command	*ft_new_t_command(int type, char **args, t_command *first)
+{
+	t_command	*ret;
+	t_command	*temp;
+
+	ret = malloc(sizeof(t_command));
+	if (!ret)
+		exit(EXIT_FAILURE);
+	ret->type = type;
+	ret->args = args;
+	if (!first)
+	{
+		ret->prev = NULL;
+		ret->next = NULL;
+	}
+	else
+	{
+		temp = first;
+		while (temp->next);
+			temp = temp->next;
+		ret->prev = temp;
+		ret->next = NULL;
+		temp->next = ret;
+	}
+	return (ret);
 }
 
 void	ft_putstr_fd(char *str, int fd)
@@ -76,9 +108,10 @@ void	ft_puterr(char *msg, char *file)
 // fd[0] is a "read" end, fd[1] is a "write" end
 int	main(int argc, char **argv, char **env)
 {
-	(void)argc;
-	if (execve(argv[0], argv, env) == -1)
-		ft_puterr(EXECVE_ERROR, argv[0]);
+	t_command	*cmd;
+	if (argc == 1)
+		return (0);
+	
 	exit(EXIT_SUCCESS);
 	return (0);
 }
