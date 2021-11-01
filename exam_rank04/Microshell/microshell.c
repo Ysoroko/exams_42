@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/19 11:27:35 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/01 13:52:00 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/01 14:56:09 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -47,33 +47,6 @@ int		ft_strlen(char *str)
 	return (i);
 }
 
-t_command	*ft_new_t_command(int type, char **args, t_command *first)
-{
-	t_command	*ret;
-	t_command	*temp;
-
-	ret = malloc(sizeof(t_command));
-	if (!ret)
-		exit(EXIT_FAILURE);
-	ret->type = type;
-	ret->args = args;
-	if (!first)
-	{
-		ret->prev = NULL;
-		ret->next = NULL;
-	}
-	else
-	{
-		temp = first;
-		while (temp->next)
-			temp = temp->next;
-		ret->prev = temp;
-		ret->next = NULL;
-		temp->next = ret;
-	}
-	return (ret);
-}
-
 void	ft_putstr_fd(char *str, int fd)
 {
 	write(fd, str, ft_strlen(str));
@@ -85,14 +58,51 @@ void	ft_putendl_fd(char *str, int fd)
 	write(fd, "\n", 1);
 }
 
-void	ft_puterr(char *msg, char *file)
+static char	*ft_strdup(char *str)
 {
-	if (!file)
-		ft_putendl_fd(msg, STDERR);
-	else
+	char	*ret;
+	int		i;
+
+	i = -1;
+	ret = malloc(sizeof(char) * ft_strlen(str));
+	if (!ret)
+		return (NULL);
+	while (str[++i])
+		ret[i] = str[i];
+	ret[i] = 0;
+	return (ret);
+}
+
+static char **ft_copy_str_tab(char **tab, int n_elements)
+{
+	int		i;
+	char	**ret;
+
+	i = -1;
+	ret = malloc(sizeof(char *) * (n_elements + 1));
+	if (!ret)
+		return (NULL);
+	while (tab[++i] && i < n_elements)
 	{
-		ft_putstr_fd(msg, STDERR);
-		ft_putendl_fd(file, STDERR);
+		ret[i] = ft_strdup(tab[i]);
+		if (!ret[i])
+			return (NULL);
+	}
+	ret[i] = NULL;
+	return (ret);
+}
+
+/// 1) Find a '|' or a ';'
+/// 2) Extract everything until then as a t_command
+void	ft_parse_user_input(t_command *cmd, char **argv)
+{
+	int			i;
+	t_command	*temp;
+
+	i = -1;
+	while (argv[++i])
+	{
+		
 	}
 }
 
@@ -109,8 +119,10 @@ void	ft_puterr(char *msg, char *file)
 int	main(int argc, char **argv, char **env)
 {
 	t_command	*cmd;
+
 	if (argc == 1)
 		return (0);
+	ft_parse_user_input(&cmd, &(argv[1]));
 	if (execve(argv[1], argv, env) == -1)
 		printf("Error\n");
 	else
