@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/19 11:27:35 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/10/22 15:17:20 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/01 13:52:00 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -65,7 +65,7 @@ t_command	*ft_new_t_command(int type, char **args, t_command *first)
 	else
 	{
 		temp = first;
-		while (temp->next);
+		while (temp->next)
 			temp = temp->next;
 		ret->prev = temp;
 		ret->next = NULL;
@@ -111,7 +111,11 @@ int	main(int argc, char **argv, char **env)
 	t_command	*cmd;
 	if (argc == 1)
 		return (0);
-	
-	exit(EXIT_SUCCESS);
+	if (execve(argv[1], argv, env) == -1)
+		printf("Error\n");
+	else
+	{
+		printf("OK\n");
+	}
 	return (0);
 }
