@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/19 11:27:35 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/02 12:15:56 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/02 13:31:08 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -137,13 +137,11 @@ static void	ft_add_elem_to_str_tab(char *str, char **str_tab)
 	int	i;
 
 	i = 0;
+	if (!str)
+		return ;
 	while (str_tab[i])
-	{
 		i++;
-	}
-	printf("here1\n");
 	str_tab[i] = ft_strdup(str);
-	printf("here2\n");
 }
 
 static void	ft_add_to_list(t_command **f, t_command **t, char *str, char **str_tab)
@@ -175,17 +173,18 @@ static char	**ft_initialize_str_tab_for_execve(char **argv)
 	char	**ret;
 	int		i;
 
-	len = ft_needed_str_tab_len(argv);
-	if (!len)
+	if (!argv[0])
 		return (NULL);
-	ret = malloc(sizeof(char *) * (len + 2));
+	len = ft_needed_str_tab_len(argv);
+	ret = malloc(sizeof(char *) * (len + 1));
 	if (!ret)
 		exit(EXIT_FAILURE);
 	i = 0;
-	while (i < len)
+	while (i <= len)
+	{
+		ret[i] = NULL;
 		i++;
-	ret[i] = NULL;
-
+	}
 	return (ret);
 }
 
@@ -194,6 +193,8 @@ static void	ft_print_str_tab(char **str_tab)
 	int	i;
 
 	i = -1;
+	if (!str_tab)
+		return ;
 	while (str_tab[++i])
 		printf("[%d]\t%s\n", i, str_tab[i]);
 }
@@ -217,19 +218,19 @@ void	ft_print_commands(t_command *first)
 
 /// 1) Find a '|' or a ';'
 /// 2) Extract everything until then as a t_command
-void	ft_parse_user_input(t_command **cmd, char **argv)
+void	ft_parse_user_input(t_command **cmd, char **argv, int argc)
 {
 	int			i;
 	char		**str_tab_for_execve;
 	t_command	*first;
 	t_command	*temp;
 
-	i = 0;
+	i = 1;
 	first = ft_new_t_command();
 	*cmd = first;
 	temp = NULL;
 	str_tab_for_execve = ft_initialize_str_tab_for_execve(argv);
-	while (argv[i])
+	while (i < argc)
 	{
 		if (ft_arg_is_a_separator(argv[i]))
 		{
@@ -262,13 +263,7 @@ int	main(int argc, char **argv, char **env)
 	if (argc == 1)
 		return (0);
 	(void)env;
-	ft_parse_user_input(&cmd, &(argv[1]));
+	ft_parse_user_input(&cmd, argv, argc);
 	ft_print_commands(cmd);
-	//if (execve(argv[1], argv, env) == -1)
-	//	printf("Error\n");
-	//else
-	//{
-	//	printf("OK\n");
-	//}
 	return (0);
 }
