@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/10/19 11:27:35 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/01 14:56:09 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/02 12:15:56 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -64,46 +64,185 @@ static char	*ft_strdup(char *str)
 	int		i;
 
 	i = -1;
-	ret = malloc(sizeof(char) * ft_strlen(str));
+	if (!str)
+		return(NULL);
+	ret = malloc(sizeof(char) * (ft_strlen(str) + 1));
 	if (!ret)
-		return (NULL);
+		exit(EXIT_FAILURE);
 	while (str[++i])
 		ret[i] = str[i];
 	ret[i] = 0;
 	return (ret);
 }
 
-static char **ft_copy_str_tab(char **tab, int n_elements)
+static int	ft_strcmp(char *str1, char *str2)
 {
-	int		i;
+	int	i;
+	
+	i = 0;
+	while (str1[i] && str2[i] && str1[i] == str2[i])
+		i++;
+	return (str1[i] - str2[i]);
+}
+
+static t_command	*ft_new_t_command(void)
+{
+	t_command	*ret;
+
+	ret = malloc(sizeof(t_command));
+	if (!ret)
+		exit(EXIT_FAILURE);
+	ret->args = 0;
+	ret->next = 0;
+	ret->prev = 0;
+	ret->type = 0;
+	return (ret);
+}
+
+int	ft_arg_is_a_separator(char *str)
+{
+	if (!ft_strcmp(str, "|"))
+		return (TYPE_PIPED);
+	else if (!ft_strcmp(str, ";"))
+		return (TYPE_SEPARATE);
+	return (0);
+}
+
+static int	ft_needed_str_tab_len(char **argv)
+{
+	int	i;
+
+	i = 0;
+	while (argv[i] && !ft_arg_is_a_separator(argv[i]))
+	{
+		i++;
+	}
+	return (i);
+}
+
+static int	ft_determine_type(char **str_tab)
+{
+	int	i;
+
+	i = 0;
+	while (str_tab[i])
+	{
+		i++;
+	}
+	return (ft_arg_is_a_separator(str_tab[i - 1]));
+}
+
+static void	ft_add_elem_to_str_tab(char *str, char **str_tab)
+{
+	int	i;
+
+	i = 0;
+	while (str_tab[i])
+	{
+		i++;
+	}
+	printf("here1\n");
+	str_tab[i] = ft_strdup(str);
+	printf("here2\n");
+}
+
+static void	ft_add_to_list(t_command **f, t_command **t, char *str, char **str_tab)
+{
+	t_command	*new_elem;
+
+	ft_add_elem_to_str_tab(str, str_tab);
+	if (!*t)
+	{
+		(*f)->args = str_tab;
+		(*f)->type = ft_determine_type(str_tab);
+		*t = ft_new_t_command();
+		(*t)->prev = *f;
+	}
+	else
+	{
+		(*t)->args = str_tab;
+		(*t)->type = ft_determine_type(str_tab);
+		new_elem = ft_new_t_command();
+		new_elem->prev = *t;
+		(*t)->next = new_elem;
+		*t = new_elem;
+	}
+}
+
+static char	**ft_initialize_str_tab_for_execve(char **argv)
+{
+	int		len;
 	char	**ret;
+	int		i;
+
+	len = ft_needed_str_tab_len(argv);
+	if (!len)
+		return (NULL);
+	ret = malloc(sizeof(char *) * (len + 2));
+	if (!ret)
+		exit(EXIT_FAILURE);
+	i = 0;
+	while (i < len)
+		i++;
+	ret[i] = NULL;
+
+	return (ret);
+}
+
+static void	ft_print_str_tab(char **str_tab)
+{
+	int	i;
 
 	i = -1;
-	ret = malloc(sizeof(char *) * (n_elements + 1));
-	if (!ret)
-		return (NULL);
-	while (tab[++i] && i < n_elements)
+	while (str_tab[++i])
+		printf("[%d]\t%s\n", i, str_tab[i]);
+}
+
+void	ft_print_commands(t_command *first)
+{
+	t_command	*temp;
+
+	temp = first;
+
+	while (temp)
 	{
-		ret[i] = ft_strdup(tab[i]);
-		if (!ret[i])
-			return (NULL);
+		printf("\n\n\n------------------------------\n\n\n");
+		printf("Type: [%d]\n", temp->type);
+		printf("Str tab for execve: \n");
+		ft_print_str_tab(temp->args);
+		printf("\n\n\n------------------------------\n\n\n");
+		temp = temp->next;
 	}
-	ret[i] = NULL;
-	return (ret);
 }
 
 /// 1) Find a '|' or a ';'
 /// 2) Extract everything until then as a t_command
-void	ft_parse_user_input(t_command *cmd, char **argv)
+void	ft_parse_user_input(t_command **cmd, char **argv)
 {
 	int			i;
+	char		**str_tab_for_execve;
+	t_command	*first;
 	t_command	*temp;
 
-	i = -1;
-	while (argv[++i])
+	i = 0;
+	first = ft_new_t_command();
+	*cmd = first;
+	temp = NULL;
+	str_tab_for_execve = ft_initialize_str_tab_for_execve(argv);
+	while (argv[i])
 	{
-		
+		if (ft_arg_is_a_separator(argv[i]))
+		{
+			ft_add_to_list(cmd, &temp, argv[i], str_tab_for_execve);
+			ft_initialize_str_tab_for_execve(&(argv[i + 1]));
+		}
+		else
+		{
+			ft_add_elem_to_str_tab(argv[i], str_tab_for_execve);
+		}
+		i++;
 	}
+	ft_add_to_list(&first, &temp, argv[i], str_tab_for_execve);
 }
 
 // fork() returns 0 to the child, pid of the child to the parent, -1 if error
@@ -122,12 +261,14 @@ int	main(int argc, char **argv, char **env)
 
 	if (argc == 1)
 		return (0);
+	(void)env;
 	ft_parse_user_input(&cmd, &(argv[1]));
-	if (execve(argv[1], argv, env) == -1)
-		printf("Error\n");
-	else
-	{
-		printf("OK\n");
-	}
+	ft_print_commands(cmd);
+	//if (execve(argv[1], argv, env) == -1)
+	//	printf("Error\n");
+	//else
+	//{
+	//	printf("OK\n");
+	//}
 	return (0);
 }
