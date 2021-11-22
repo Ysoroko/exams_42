@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/22 11:59:50 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/22 12:50:40 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -162,6 +162,7 @@ char	*ft_strdup_exit(char *str)
 	ret = malloc(sizeof(char) * (len + 1));
 	if (!ret)
 		ft_puterr(SYS_ERR, NULL, EXIT);
+	i = -1;
 	while (str[++i])
 		ret[i] = str[i];
 	ret[i] = '\0';
@@ -177,12 +178,14 @@ char	**ft_strtab_n_copy_exit(char **src, int n_elems_to_copy)
 	int		i;
 	char	**ret;
 
-	ret = malloc(sizeof(*ret) * (n_elems_to_copy + 1));
+	ret = malloc(sizeof(*ret) * (n_elems_to_copy + 2));
 	if (!ret)
 		ft_puterr(SYS_ERR, NULL, EXIT);
 	i = -1;
 	while (src[++i] && i < n_elems_to_copy)
+	{
 		ret[i] = ft_strdup_exit(src[i]);
+	}
 	ret[i] = NULL;
 	return (ret);
 }
@@ -225,12 +228,12 @@ void	ft_extract_and_add_command(t_cmd **first, char **checkpnt, int i, int *j)
 	char	**tab_for_execve;
 	int		len;
 
+
 	temp = ft_new_t_cmd_exit();
 	len = ft_str_tab_len_needed(checkpnt);
 	tab_for_execve = ft_strtab_n_copy_exit(checkpnt, len);
 	temp->tab_for_execve = tab_for_execve;
-	ft_print_str_tab(tab_for_execve);
-	temp->type = ft_pipe_or_sep(checkpnt[len]);
+	temp->type = ft_pipe_or_sep(checkpnt[len - 1]);
 	ft_cmd_add_back(first, temp);
 	*j = i + 1;
 }
@@ -254,6 +257,7 @@ t_cmd	*ft_extract_command_list(char **argv)
 		if (ft_pipe_or_sep(argv[i]))
 			ft_extract_and_add_command(&ret, &(argv[j]), i, &j);
 	}
+	ft_extract_and_add_command(&ret, &(argv[j]), i, &j);
 	return (ret);
 }
 
@@ -261,6 +265,10 @@ int	main(int argc, char **argv, char **env)
 {
 	t_cmd	*lst;
 
+	int i = 0;
+	while (argv[++i])
+		printf("argv[%d]: %s\n", i, argv[i]);
 	lst = ft_extract_command_list(argv);
+	ft_print_cmd_list(lst);
 	return (0);
 }
