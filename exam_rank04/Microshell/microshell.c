@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/22 12:50:40 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/22 12:53:14 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -251,7 +251,7 @@ t_cmd	*ft_extract_command_list(char **argv)
 
 	i = 0;
 	ret = NULL;
-	j = 0;
+	j = 1;
 	while (argv[++i])
 	{
 		if (ft_pipe_or_sep(argv[i]))
