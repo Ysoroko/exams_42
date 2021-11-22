@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/22 11:56:21 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/22 11:59:50 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,6 +44,41 @@ typedef struct s_cmd
 #define PIPE '|'
 #define SEP ';'
 #define STD '0'
+
+/*
+** Debug:
+** ----------------------------------------------------------------------------
+*/
+
+void	ft_print_str_tab(char **tab)
+{
+	int	i;
+
+	i = -1;
+	printf("STR_TAB:\n");
+	printf("-----------------\n");
+	while (tab[++i])
+		printf("%s\n", tab[i]);
+	printf("-----------------\n");
+}
+
+void	ft_print_cmd_list(t_cmd *first)
+{
+	t_cmd	*temp;
+	int		i;
+
+	temp = first;
+	i = 1;
+	while (temp)
+	{
+		printf("%d\n", i);
+		ft_print_str_tab(temp->tab_for_execve);
+		printf("Type: [%c]\n", temp->type);
+		printf("-----------------\n");
+		temp = temp->next;
+		i++;
+	}
+}
 
 /*
 ** Utils:
@@ -194,40 +229,12 @@ void	ft_extract_and_add_command(t_cmd **first, char **checkpnt, int i, int *j)
 	len = ft_str_tab_len_needed(checkpnt);
 	tab_for_execve = ft_strtab_n_copy_exit(checkpnt, len);
 	temp->tab_for_execve = tab_for_execve;
+	ft_print_str_tab(tab_for_execve);
 	temp->type = ft_pipe_or_sep(checkpnt[len]);
 	ft_cmd_add_back(first, temp);
 	*j = i + 1;
 }
 
-void	ft_print_str_tab(char **tab)
-{
-	int	i;
-
-	i = -1;
-	printf("STR_TAB:\n");
-	printf("-----------------\n");
-	while (tab[++i])
-		printf("%s\n", tab[i]);
-	printf("-----------------\n");
-}
-
-void	ft_print_cmd_list(t_cmd *first)
-{
-	t_cmd	*temp;
-	int		i;
-
-	temp = first;
-	i = 1;
-	while (temp)
-	{
-		printf("%d\n", i);
-		ft_print_str_tab(temp->tab_for_execve);
-		printf("Type: [%c]\n", temp->type);
-		printf("-----------------\n");
-		temp = temp->next;
-		i++;
-	}
-}
 /*
 ** Main functions:
 ** ----------------------------------------------------------------------------
@@ -255,6 +262,5 @@ int	main(int argc, char **argv, char **env)
 	t_cmd	*lst;
 
 	lst = ft_extract_command_list(argv);
-	ft_print_cmd_list(lst);
 	return (0);
 }
