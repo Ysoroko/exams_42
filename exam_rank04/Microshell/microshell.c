@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/22 12:53:14 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/24 10:45:24 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -45,10 +45,7 @@ typedef struct s_cmd
 #define SEP ';'
 #define STD '0'
 
-/*
-** Debug:
-** ----------------------------------------------------------------------------
-*/
+// ---------------------------- Debug ----------------------------------------
 
 void	ft_print_str_tab(char **tab)
 {
@@ -80,10 +77,7 @@ void	ft_print_cmd_list(t_cmd *first)
 	}
 }
 
-/*
-** Utils:
-** ----------------------------------------------------------------------------
-*/
+// ------------------------------ Utils --------------------------------------
 
 int	ft_strlen(char *str)
 {
@@ -122,34 +116,6 @@ void	ft_puterr(char *str, char *str2, int to_exit)
 		exit(EXIT_FAILURE);
 }
 
-char	ft_pipe_or_sep(char *str)
-{
-	if (!strcmp(str, "|"))
-		return ('|');
-	if (!strcmp(str, ";"))
-		return (';');
-	return (0);
-}
-
-/*
-** Calculates the length needed to malloc a tab of strings until ";" or "|"
-*/
-
-int	ft_str_tab_len_needed(char **argv)
-{
-	int		i;
-
-	if (!argv)
-		return (0);
-	i = -1;
-	while (argv[++i])
-	{
-		if (ft_pipe_or_sep(argv[i]))
-			return (i + 1);
-	}
-	return (i);
-}
-
 char	*ft_strdup_exit(char *str)
 {
 	int		i;
@@ -169,26 +135,7 @@ char	*ft_strdup_exit(char *str)
 	return (ret);
 }
 
-/*
-** Creates an array of strings composed of n_elems_to_copy next elements of src
-*/
-
-char	**ft_strtab_n_copy_exit(char **src, int n_elems_to_copy)
-{
-	int		i;
-	char	**ret;
-
-	ret = malloc(sizeof(*ret) * (n_elems_to_copy + 2));
-	if (!ret)
-		ft_puterr(SYS_ERR, NULL, EXIT);
-	i = -1;
-	while (src[++i] && i < n_elems_to_copy)
-	{
-		ret[i] = ft_strdup_exit(src[i]);
-	}
-	ret[i] = NULL;
-	return (ret);
-}
+// ---------------------------- t_cmd utils ----------------------------------
 
 t_cmd	*ft_new_t_cmd_exit(void)
 {
@@ -222,6 +169,57 @@ void ft_cmd_add_back(t_cmd **first, t_cmd *to_add)
 	to_add->prev = last;
 }
 
+// ------------------------------ Parsing ------------------------------------
+
+/*
+** Calculates the length needed to malloc a tab of strings until ";" or "|"
+*/
+
+int	ft_str_tab_len_needed(char **argv)
+{
+	int		i;
+
+	if (!argv)
+		return (0);
+	i = -1;
+	while (argv[++i])
+	{
+		if (ft_pipe_or_sep(argv[i]))
+			return (i + 1);
+	}
+	return (i);
+}
+
+char	ft_pipe_or_sep(char *str)
+{
+	if (!strcmp(str, "|"))
+		return ('|');
+	if (!strcmp(str, ";"))
+		return (';');
+	return (0);
+}
+
+/*
+** Creates an array of strings composed of n_elems_to_copy next elements of src
+*/
+
+char	**ft_strtab_n_copy_exit(char **src, int n_elems_to_copy)
+{
+	int		i;
+	char	**ret;
+
+	ret = malloc(sizeof(*ret) * (n_elems_to_copy + 2));
+	if (!ret)
+		ft_puterr(SYS_ERR, NULL, EXIT);
+	i = -1;
+	while (src[++i] && i < n_elems_to_copy)
+	{
+		ret[i] = ft_strdup_exit(src[i]);
+	}
+	ret[i] = NULL;
+	return (ret);
+}
+
 void	ft_extract_and_add_command(t_cmd **first, char **checkpnt, int i, int *j)
 {
 	t_cmd	*temp;
@@ -238,10 +236,7 @@ void	ft_extract_and_add_command(t_cmd **first, char **checkpnt, int i, int *j)
 	*j = i + 1;
 }
 
-/*
-** Main functions:
-** ----------------------------------------------------------------------------
-*/
+// ------------------------------ Main ------------------------------------
 
 t_cmd	*ft_extract_command_list(char **argv)
 {
