@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/30 11:43:20 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/30 12:22:54 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -24,6 +24,7 @@ typedef struct s_cmd
 {
 	struct s_cmd	*next;
 	struct s_cmd	*prev;
+	int				fd[2];
 	char			**tab_for_execve;
 	char			type;
 }	t_cmd;
@@ -135,6 +136,16 @@ char	*ft_strdup_exit(char *str)
 	return (ret);
 }
 
+int	ft_str_tab_len(char **tab)
+{
+	int	i;
+
+	i = 0;
+	while (tab[i])
+		i++;
+	return (i);
+}
+
 // ---------------------------- t_cmd utils ----------------------------------
 
 t_cmd	*ft_new_t_cmd_exit(void)
@@ -235,6 +246,109 @@ void	ft_extract_and_add_command(t_cmd **first, char **checkpnt, int i, int *j)
 	ft_cmd_add_back(first, temp);
 	*j = i + 1;
 }
+
+
+// ---------------------------- Execute -----------------------------------
+
+int	ft_cd(char **str_tab)
+{
+	char	*cd_arg;
+
+	cd_arg = str_tab[1];
+	if (ft_str_tab_len(str_tab) < 2)
+		return(ft_puterr(CD_ARG_ERR, NULL, 1));
+	else
+	{
+		if (chdir(cd_arg))
+			ft_puterr(CD_FAIL_ERR, cd_arg, 1);
+	}
+	return (0);
+}
+
+int	ft_fork_and_pipe(t_cmd *cmd, char **env)
+{
+	int		fork_ret;
+	char	type;
+	int		prev_type;
+	t_cmd	*prev;
+	int		ret;
+	int		status;
+
+	type = cmd->type;
+	prev_type = 0;
+	prev = cmd->prev;
+	if (prev)
+		prev_type = prev->type;
+	if (type == '|' || prev_type == '|')
+		{
+			if (pipe(cmd->fd))
+				ft_puterr(SYS_ERR, NULL, 1);
+		}
+	fork_ret = fork();
+	if (fork_ret < 0)
+		ft_puterr(SYS_ERR, NULL, 1);
+	if (fork_ret == 0)
+	{
+		if (type == '|' && dup2(cmd->fd[1], STDOUT) < 0)
+			ft_puterr(SYS_ERR, NULL, 1);
+		if (prev_type == '|' && dup2(prev->fd[0], STDIN) < 0))
+			ft_puterr(SYS_ERR, NULL, 1);
+		if (ret == execve(cmd->tab_for_execve[0], cmd->tab_for_execve, env) < 0)
+		{
+			ft_puterr(EXECVE_ERR, cmd->tab_for_execve[0], 1);
+		}
+		exit (ret);
+	}
+	else
+	{
+		waitpid(forK_ret, &status, 0);
+		if (type == '|' || prev_type == '|')
+		{
+			close(cmd->fd[1]);
+			if (!cmd->next || cmd->type != '|'))
+				close(cmd->fd[0]);
+			if (prev_type == '|')
+				close(prev->fd[0]);
+		}
+		if (WIFEXITED(status))
+			ret = WEXITSTATUS(status);
+	}
+	return (ret);
+
+}
+
+int	ft_execute_command(t_cmd *cmd, char **env)
+{
+	char	*cmd_name;
+	char	**str_tab;
+	char	type;
+	int		ret;
+
+	ret =
+	str_tab = cmd->tab_for_execve;
+	cmd_name = str_tab[0];
+	type = cmd->type;
+	if (!strcmp(cmd_name, "cd"))
+		ret = ft_cd(cmd);
+	else
+	{
+		ret = ft_fork_and_pipe(cmd, env);
+	}
+	
+}
+
+void	ft_execute_command_list(t_cmd *lst, char **env)
+{
+	t_cmd	*current;
+
+	current = lst;
+	while (current)
+	{
+		ft_execute_command(current, env);
+		current = current->next;
+	}
+}
+
 
 // ------------------------------ Main ------------------------------------
 
