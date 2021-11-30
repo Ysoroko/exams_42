@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/24 10:45:24 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/11/30 11:43:20 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -171,6 +171,15 @@ void ft_cmd_add_back(t_cmd **first, t_cmd *to_add)
 
 // ------------------------------ Parsing ------------------------------------
 
+char	ft_pipe_or_sep(char *str)
+{
+	if (!strcmp(str, "|"))
+		return ('|');
+	if (!strcmp(str, ";"))
+		return (';');
+	return (0);
+}
+
 /*
 ** Calculates the length needed to malloc a tab of strings until ";" or "|"
 */
@@ -188,15 +197,6 @@ int	ft_str_tab_len_needed(char **argv)
 			return (i + 1);
 	}
 	return (i);
-}
-
-char	ft_pipe_or_sep(char *str)
-{
-	if (!strcmp(str, "|"))
-		return ('|');
-	if (!strcmp(str, ";"))
-		return (';');
-	return (0);
 }
 
 /*
