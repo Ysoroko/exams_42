@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/11/30 12:22:54 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/12/14 17:37:14 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -15,78 +15,68 @@
 #include <string.h>
 #include <stdlib.h>
 
-/*
-** Macros and structures:
-** ----------------------------------------------------------------------------
-*/
+// ------------------------- MACROS ANS STRUCTURES ----------------------------
 
-typedef struct s_cmd
+typedef struct	s_cmd
 {
+	int				fd[2];
+	char			**tab;
+	char			type;
 	struct s_cmd	*next;
 	struct s_cmd	*prev;
-	int				fd[2];
-	char			**tab_for_execve;
-	char			type;
 }	t_cmd;
 
-// Error messages
-#define CD_ARG_ERR "error: cd: bad arguments"
-#define CD_FAIL_ERR "error: cd: cannot change directory to " //followed by path
-#define SYS_ERR "error: fatal"
-#define EXECVE_ERR "error: cannot execute " //followed by the exe name!
-
-// Error output file descriptor
+#define STDIN 0
+#define STDOUT 1
 #define STDERR 2
 
-// Macros which determine if we exit in ft_puterr
+#define CD_N_ARGS_ERR "error: cd: bad arguments"
+#define CD_ERR "error: cd: cannot change directory to " //path to add!
+
+#define SYS_ERR "error: fatal"
+#define EXECVE_ERR "error: cannot execute " //executable to add!
+
 #define EXIT 1
 #define NO_EXIT 0
 
-#define PIPE '|'
-#define SEP ';'
-#define STD '0'
-
-// ---------------------------- Debug ----------------------------------------
+// ----------------------------- DEBUG --------------------------------------
 
 void	ft_print_str_tab(char **tab)
 {
-	int	i;
+	int i = -1;
+	int	j = 0;
 
-	i = -1;
-	printf("STR_TAB:\n");
-	printf("-----------------\n");
+	printf("\n\n ----------- TAB ----------- \n\n");
 	while (tab[++i])
-		printf("%s\n", tab[i]);
-	printf("-----------------\n");
+	{
+		printf("[%d]:\t%s\n", ++j, tab[i]);
+	}
+	printf("\n\n --------------------------- ");
 }
 
-void	ft_print_cmd_list(t_cmd *first)
+void	ft_print_cmd_list(t_cmd	*first)
 {
-	t_cmd	*temp;
-	int		i;
+	int		i = 0;
+	t_cmd	*temp = first;
 
-	temp = first;
-	i = 1;
 	while (temp)
 	{
-		printf("%d\n", i);
-		ft_print_str_tab(temp->tab_for_execve);
-		printf("Type: [%c]\n", temp->type);
-		printf("-----------------\n");
+		printf("\n\n\n----------------------- [%d] -----------------------\n\n", ++i);
+		printf("TYPE: [%c]\n", temp->type);
+		ft_print_str_tab(temp->tab);
 		temp = temp->next;
-		i++;
 	}
+	printf("\n\n\n----------------------------------------------------");
 }
 
-// ------------------------------ Utils --------------------------------------
+// ------------------------------ UTILS -------------------------------------
 
 int	ft_strlen(char *str)
 {
-	int i;
-
-	if (!str)
+	int i = 0;
+	
+	if(!str)
 		return (0);
-	i = 0;
 	while (str[i])
 		i++;
 	return (i);
@@ -97,287 +87,96 @@ void	ft_putchar_fd(char c, int fd)
 	write(fd, &c, 1);
 }
 
-void	ft_puterr(char *str, char *str2, int to_exit)
+void	ft_putstr_fd(char *str, int fd)
 {
-	int	i;
+	write(fd, str, ft_strlen(str));
+}
 
-	if (!str)
-		return ;
-	i = -1;
-	while (str[++i])
-		ft_putchar_fd(str[i], 2);
-	if (str2)
-	{
-		i = -1;
-		while (str2[++i])
-			ft_putchar_fd(str[i], 2);
-	}
-	ft_putchar_fd('\n', 2);
+void	ft_puterr(char *msg, char *arg, int to_exit)
+{
+	ft_putstr_fd(msg, STDERR);
+	if (arg)
+		ft_putstr_fd(arg, STDERR);
+	ft_putchar_fd('\n', STDERR);
 	if (to_exit)
 		exit(EXIT_FAILURE);
 }
 
-char	*ft_strdup_exit(char *str)
-{
-	int		i;
-	int		len;
-	char	*ret;
+// ----------------------------- T_CMD UTILS ----------------------
 
-	if (!str)
-		return (NULL);
-	len = ft_strlen(str);
-	ret = malloc(sizeof(char) * (len + 1));
+t_cmd	*ft_new_t_cmd(char **tab, char type)
+{
+	t_cmd	*ret = malloc(sizeof(t_cmd));
+
 	if (!ret)
 		ft_puterr(SYS_ERR, NULL, EXIT);
-	i = -1;
-	while (str[++i])
-		ret[i] = str[i];
-	ret[i] = '\0';
+	ret->tab = tab;
+	ret->type = type;
+	ret->prev = NULL;
+	ret->next = NULL;
 	return (ret);
 }
 
-int	ft_str_tab_len(char **tab)
+void	ft_cmd_add_back(t_cmd **start, t_cmd *next)
 {
-	int	i;
+	t_cmd	*temp = *start;
 
-	i = 0;
-	while (tab[i])
-		i++;
-	return (i);
-}
-
-// ---------------------------- t_cmd utils ----------------------------------
-
-t_cmd	*ft_new_t_cmd_exit(void)
-{
-	t_cmd	*cmd;
-
-	cmd = malloc(sizeof(t_cmd));
-	if (!cmd)
-		ft_puterr(SYS_ERR, NULL, EXIT);
-	cmd->tab_for_execve = NULL;
-	cmd->next = NULL;
-	cmd->prev = NULL;
-	cmd->type = '0';
-	return (cmd);
-}
-
-void ft_cmd_add_back(t_cmd **first, t_cmd *to_add)
-{
-	t_cmd	*last;
-	
-	if (!to_add)
-		return ;
-	if (!*first)
+	if (!*start)
+		*start = next;
+	else
 	{
-		*first = to_add;
-		return ;
+		while (temp->next)
+			temp = temp->next;
+		temp->next = next;
+		next->prev = temp;
 	}
-	last = *first;
-	while (last->next)
-		last = last->next;
-	last->next = to_add;
-	to_add->prev = last;
 }
 
-// ------------------------------ Parsing ------------------------------------
+// ----------------------------- PARSING --------------------------
 
-char	ft_pipe_or_sep(char *str)
+char	ft_get_type(char *str)
 {
-	if (!strcmp(str, "|"))
-		return ('|');
 	if (!strcmp(str, ";"))
 		return (';');
+	if (!strcmp(str, "|"))
+		return ('|');
 	return (0);
 }
 
-/*
-** Calculates the length needed to malloc a tab of strings until ";" or "|"
-*/
-
-int	ft_str_tab_len_needed(char **argv)
+t_cmd	*ft_parse_args(char **argv)
 {
-	int		i;
+	t_cmd	*ret = NULL;
+	char	**start = argv;
+	int		i = -1;
+	t_cmd	*temp = NULL;
+	char	type = 0;
 
-	if (!argv)
-		return (0);
-	i = -1;
 	while (argv[++i])
 	{
-		if (ft_pipe_or_sep(argv[i]))
-			return (i + 1);
+		type = ft_get_type(argv[i]);
+		if (type)
+		{
+			temp = ft_new_t_cmd(start, type);
+			ft_cmd_add_back(&ret, temp);
+			argv[i] = NULL;
+			start = &(argv[i + 1]);
+		}
 	}
-	return (i);
-}
-
-/*
-** Creates an array of strings composed of n_elems_to_copy next elements of src
-*/
-
-char	**ft_strtab_n_copy_exit(char **src, int n_elems_to_copy)
-{
-	int		i;
-	char	**ret;
-
-	ret = malloc(sizeof(*ret) * (n_elems_to_copy + 2));
-	if (!ret)
-		ft_puterr(SYS_ERR, NULL, EXIT);
-	i = -1;
-	while (src[++i] && i < n_elems_to_copy)
-	{
-		ret[i] = ft_strdup_exit(src[i]);
-	}
-	ret[i] = NULL;
+	temp = ft_new_t_cmd(start, type);
+	ft_cmd_add_back(&ret, temp);
 	return (ret);
 }
 
-void	ft_extract_and_add_command(t_cmd **first, char **checkpnt, int i, int *j)
-{
-	t_cmd	*temp;
-	char	**tab_for_execve;
-	int		len;
 
+// ----------------------------- MAIN --------------------------
 
-	temp = ft_new_t_cmd_exit();
-	len = ft_str_tab_len_needed(checkpnt);
-	tab_for_execve = ft_strtab_n_copy_exit(checkpnt, len);
-	temp->tab_for_execve = tab_for_execve;
-	temp->type = ft_pipe_or_sep(checkpnt[len - 1]);
-	ft_cmd_add_back(first, temp);
-	*j = i + 1;
-}
-
-
-// ---------------------------- Execute -----------------------------------
-
-int	ft_cd(char **str_tab)
-{
-	char	*cd_arg;
-
-	cd_arg = str_tab[1];
-	if (ft_str_tab_len(str_tab) < 2)
-		return(ft_puterr(CD_ARG_ERR, NULL, 1));
-	else
-	{
-		if (chdir(cd_arg))
-			ft_puterr(CD_FAIL_ERR, cd_arg, 1);
-	}
-	return (0);
-}
-
-int	ft_fork_and_pipe(t_cmd *cmd, char **env)
-{
-	int		fork_ret;
-	char	type;
-	int		prev_type;
-	t_cmd	*prev;
-	int		ret;
-	int		status;
-
-	type = cmd->type;
-	prev_type = 0;
-	prev = cmd->prev;
-	if (prev)
-		prev_type = prev->type;
-	if (type == '|' || prev_type == '|')
-		{
-			if (pipe(cmd->fd))
-				ft_puterr(SYS_ERR, NULL, 1);
-		}
-	fork_ret = fork();
-	if (fork_ret < 0)
-		ft_puterr(SYS_ERR, NULL, 1);
-	if (fork_ret == 0)
-	{
-		if (type == '|' && dup2(cmd->fd[1], STDOUT) < 0)
-			ft_puterr(SYS_ERR, NULL, 1);
-		if (prev_type == '|' && dup2(prev->fd[0], STDIN) < 0))
-			ft_puterr(SYS_ERR, NULL, 1);
-		if (ret == execve(cmd->tab_for_execve[0], cmd->tab_for_execve, env) < 0)
-		{
-			ft_puterr(EXECVE_ERR, cmd->tab_for_execve[0], 1);
-		}
-		exit (ret);
-	}
-	else
-	{
-		waitpid(forK_ret, &status, 0);
-		if (type == '|' || prev_type == '|')
-		{
-			close(cmd->fd[1]);
-			if (!cmd->next || cmd->type != '|'))
-				close(cmd->fd[0]);
-			if (prev_type == '|')
-				close(prev->fd[0]);
-		}
-		if (WIFEXITED(status))
-			ret = WEXITSTATUS(status);
-	}
-	return (ret);
-
-}
-
-int	ft_execute_command(t_cmd *cmd, char **env)
-{
-	char	*cmd_name;
-	char	**str_tab;
-	char	type;
-	int		ret;
-
-	ret =
-	str_tab = cmd->tab_for_execve;
-	cmd_name = str_tab[0];
-	type = cmd->type;
-	if (!strcmp(cmd_name, "cd"))
-		ret = ft_cd(cmd);
-	else
-	{
-		ret = ft_fork_and_pipe(cmd, env);
-	}
-	
-}
-
-void	ft_execute_command_list(t_cmd *lst, char **env)
-{
-	t_cmd	*current;
-
-	current = lst;
-	while (current)
-	{
-		ft_execute_command(current, env);
-		current = current->next;
-	}
-}
-
-
-// ------------------------------ Main ------------------------------------
-
-t_cmd	*ft_extract_command_list(char **argv)
-{
-	t_cmd	*ret;
-	int		i;
-	int		j;
-
-	i = 0;
-	ret = NULL;
-	j = 1;
-	while (argv[++i])
-	{
-		if (ft_pipe_or_sep(argv[i]))
-			ft_extract_and_add_command(&ret, &(argv[j]), i, &j);
-	}
-	ft_extract_and_add_command(&ret, &(argv[j]), i, &j);
-	return (ret);
-}
-
-int	main(int argc, char **argv, char **env)
+int	main(int argc, char **argv)
 {
 	t_cmd	*lst;
-
-	int i = 0;
-	while (argv[++i])
-		printf("argv[%d]: %s\n", i, argv[i]);
-	lst = ft_extract_command_list(argv);
+	
+	if (argc == 1)
+		return (0);
+	lst = ft_parse_args(&(argv[1]));
 	ft_print_cmd_list(lst);
 	return (0);
 }
