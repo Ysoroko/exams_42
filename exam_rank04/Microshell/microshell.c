@@ -6,7 +6,7 @@
 /*   By: ysoroko <ysoroko@student.42.fr>            +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2021/11/22 10:12:44 by ysoroko           #+#    #+#             */
-/*   Updated: 2021/12/15 10:39:46 by ysoroko          ###   ########.fr       */
+/*   Updated: 2021/12/15 15:28:21 by ysoroko          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -178,133 +178,99 @@ t_cmd	*ft_parse_args(char **argv)
 
 // ---------------------------- EXECUTION --------------------------
 
-int	ft_cd(t_cmd	*cmd)
+int	ft_cd(char **tab)
 {
-	char	*cd_arg = cmd->tab[1];
+	char	*cd_arg;
 
-	if (ft_str_tab_len(cmd->tab) < 2)
-		ft_puterr(CD_N_ARGS_ERR, NULL, EXIT);
-	if (chdir(cd_arg) == -1)
-		ft_puterr(CD_ERR, cd_arg, EXIT);
-	return (0);
-}
-
-int		ft_is_piped(t_cmd *cmd)
-{
-	char	type = cmd->type;
-	char	prev_type = 0;
-	t_cmd	*prev = cmd->prev;
-
-	if (prev)
-		prev_type = prev->type;
-	if (type == '|' || prev_type == '|')
+	if (ft_str_tab_len(tab) < 2)
+	{
+		ft_puterr(CD_N_ARGS_ERR, NULL, NO_EXIT);
 		return (1);
+	}
+	cd_arg = tab[1];
+	if (chdir(cd_arg) < 1)
+	{
+		ft_puterr(CD_ERR, cd_arg, NO_EXIT);
+		return (1);
+	}
 	return (0);
-}
-
-void	ft_setup_pipes(t_cmd *cmd)
-{
-	if (ft_is_piped(cmd))
-	{
-		if (pipe(cmd->fd) == -1)
-			ft_puterr(SYS_ERR, NULL, EXIT);
-	}
-}
-
-void	ft_dup2_child(t_cmd *cmd)
-{
-	if (cmd->prev && cmd->prev->type == '|')
-	{
-		if (dup2(cmd->prev->fd[0], STDIN) == -1)
-			ft_puterr(SYS_ERR, NULL, EXIT);
-	}
-	if (cmd->type == '|')
-	{
-		if (dup2(cmd->fd[1], STDOUT) == -1)
-			ft_puterr(SYS_ERR, NULL, EXIT);
-	}
 }
 
 void	ft_child_process(t_cmd *cmd, char **env)
 {
-	char	**str_tab_for_execve = cmd->tab;
-	char	*exe_name = str_tab_for_execve[0];
+	char	*exe = cmd->tab[0];
+	char	**tab = cmd->tab;
 
-	if (ft_is_piped(cmd))
-		ft_dup2_child(cmd);
-	if (execve(exe_name, str_tab_for_execve, env) == -1)
-		ft_puterr(EXECVE_ERR, exe_name, EXIT);
-	exit(0);
-}
-
-void	ft_close_pipes(t_cmd *cmd)
-{
-	if (ft_is_piped(cmd))
-	{
-		close(cmd->fd[1]);
-		if (cmd->type != '|')
-			close(cmd->fd[0]);
-		if (cmd->prev && cmd->prev->type == '|')
-			close(cmd->prev->fd[0]);
-	}
+	if (cmd->type == '|')
+		dup2(cmd->fd[1], STDOUT);
+	if (cmd->prev && cmd->prev->type == '|')
+		dup2(cmd->prev->fd[0], STDIN);
+	if (execve(exe, tab, env) < 0)
+		ft_puterr(EXECVE_ERR, exe, EXIT);
 }
 
 int	ft_parent_process(t_cmd *cmd, int fork_ret)
 {
-	int	status = 0;
 	int	ret = 0;
+	int	status;
 
-	if (waitpid(fork_ret, &status, 0) == -1)
-		ft_puterr(SYS_ERR, NULL, EXIT);
+	waitpid(fork_ret, &status, 0);
 	if (WIFEXITED(status))
 		ret = WEXITSTATUS(status);
-	ft_close_pipes(cmd);
+	if (cmd->type == '|' || (cmd->prev && cmd->prev->type == '|'))
+	{
+		close(cmd->fd[1]);
+		if (cmd->type != '|')
+			close(cmd->fd[0]);
+	}
+	if (cmd->prev && cmd->prev->type == '|')
+		close(cmd->prev->fd[0]);
 	return (ret);
 }
 
 int	ft_fork_and_execve(t_cmd *cmd, char **env)
 {
-	int		fork_ret;
-	int		ret = 0;
+	int	ret = 0;
+	int	fork_ret = 0;
 
-	ft_setup_pipes(cmd);
+	if (cmd->type == '|' || (cmd->prev && cmd->prev->type == '|'))
+		pipe(cmd->fd);
 	fork_ret = fork();
-	if (fork_ret == 0)
+	if (!fork_ret)
 		ft_child_process(cmd, env);
 	else
 		ret = ft_parent_process(cmd, fork_ret);
 	return (ret);
 }
 
-int	ft_execute_current_command(t_cmd *cmd, char **env)
+int	ft_execute_cmd(t_cmd *cmd, char **env)
 {
-	char	*command_name = NULL;
+	char	**tab = cmd->tab;
+	char	*exe = NULL;
 	int		ret = 0;
-	
-	if (!cmd->tab)
+
+	if (!tab || !tab[0])
 		return (0);
-	command_name = cmd->tab[0];
-	if (!strcmp(command_name, "cd"))
-		ret = ft_cd(cmd);
+	exe = tab[0];
+	if (!strcmp(exe, "cd"))
+		ret = ft_cd(tab);
 	else
 		ret = ft_fork_and_execve(cmd, env);
 	return (ret);
 }
 
-
-void	ft_execute_command_list(t_cmd *first, char **env)
+void	ft_execute_command_list(t_cmd *lst, char **env)
 {
-	t_cmd	*current = first;
-	int	ret = 0;
+	t_cmd	*current = lst;
+	int		ret = 0;
 
 	while (current)
 	{
-		ret = ft_execute_current_command(current, env);
+		ret = ft_execute_cmd(current, env);
 		current = current->next;
 	}
 	exit(ret);
 }
-
 
 // ----------------------------- MAIN ------------------------------
 
